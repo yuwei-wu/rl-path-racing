@@ -2,11 +2,11 @@
 
 We are trying to combine reinforcement learning and trajectory optimization to win in F 1/10 racing. This repository is under heavy development and is not yet stable for any use-case.
 
+Soft Q Network training of RL agent for high level decision making. https://github.com/christopher-hsu/f1tenth-spinningup
+
 ## Milestone 1 Proposal:
 
 You can read our proposal here: [Proposal](docs/Proposal.pdf)
-
-Soft Q Network training of RL agent for high level decision making. https://github.com/christopher-hsu/f1tenth-spinningup
 
 
 ## Milestone 2 (Race one):
@@ -28,7 +28,41 @@ The main goal is to drive safely around the track by avoiding obstacles. The met
 
 
 
+## Milestone 4 (Final race):
 
+Our solution tries to combine safety of formal methods with performance of learning based methods, given a set of spline paths, the RL-based high-level decision maker learns to choose a path to follow based on the current observations of the race
+Then our controller uses the action (decided path), confirms with TTC for availability of the path and uses pure pursuit to follow the decision. In the gif below you can see how we perfrom against an opponent agent (Our agent is blue).
+
+
+<p align="center">
+  <img src="final_race/videos/rl-ttc.gif">
+</p>
+
+### Structure of SQN policy -- state to action
+
+Modified from Soft Actor Critic from OpenAI SpinningUp https://spinningup.openai.com/en/latest/
+ <p align="center">
+  <img src="final_race/videos/rlsqn.jpg" width="70%" height="70%" >
+</p>
+ 
+- Based on Clipped Double Q-learning - Fujimoto 2018      
+- Outputs discrete actions      
+- Using entropy regularized exploration     
+
+
+### Overall Reinforcement Learning Training Strategy (self play, adversarial style learning)
+
+- Train ego agent against pure-pursuit opponent agent without notion of obstacles
+   - Did not learn a good policy because opponent agent doesn’t react
+   - Therefore...
+- Train ego agent against opponent agent following a path with TTC reaction
+- Train ego agent against the previously learned policy
+- Repeat
+
+- Some additional things
+  - Cosine learning rate schedule
+  - Randomly initialize agents to be in first or second position at start 
+ 
 ## Logistics
 
 We have included both the new and old f110 simulators in this repository. Make sure that the new simulator pre requisites are properly installed (docker,etc.).
@@ -60,6 +94,13 @@ For the new simulator:
 
   *  Go to `f1tenth_gym_ros` folder and run the following in a new terminal: `sudo ./docker.sh`
   *  Run the following in a new terminal: `roslaunch second_race race_new.launch`
+  
+#### Final Race: moving opponent, no obstacles
+
+For the new simulator:
+
+  *  Go to `f1tenth_gym_ros` folder and run the following in a new terminal: `sudo ./docker.sh`
+  *  Run the following in a new terminal: `roslaunch final_race race_new.launch`
 
 #### Progress updates
 
